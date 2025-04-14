@@ -19,5 +19,5 @@ app.use('/api/medico', medicoRoutes);
 app.use('/api/admin', adminRoutes);
 
 app.listen(3000, () => {
-  console.log('Servidor corriendo en http://localhost:3000');
+  console.log('Servidor corriendo en http://localhost:8080');
 });
