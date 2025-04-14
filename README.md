@@ -1,1 +1,0 @@
-# metodolog-a
