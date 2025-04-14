@@ -2,9 +2,6 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db');
 const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-
-const SECRET = 'clave_super_segura';
 
 router.post('/login', async (req, res) => {
   const { email, password } = req.body;
@@ -23,14 +20,13 @@ router.post('/login', async (req, res) => {
       return res.status(401).json({ mensaje: 'Contraseña incorrecta' });
     }
 
-    const token = jwt.sign({
+    // No enviamos token, solo datos útiles
+    res.json({
       id: usuario.id,
       nombre: usuario.nombre,
       rol: usuario.rol,
       dni: usuario.dni
-    }, SECRET, { expiresIn: '2h' });
-
-    res.json({ token, nombre: usuario.nombre, rol: usuario.rol });
+    });
   } catch (error) {
     res.status(500).json({ mensaje: 'Error en el servidor', error });
   }
