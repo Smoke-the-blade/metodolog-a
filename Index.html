@@ -3,16 +3,30 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salud Total</title>
+    <title>Salud Total - Iniciar sesión</title>
+    <link rel="stylesheet" href="estilos.css">
 </head>
 <body>
-    <h1>Bienvenido a Salud Total</h1>
-    <h2>Iniciar sesión</h2>
-    <form id="loginForm">
-        <input type="text" id="usuario" placeholder="Usuario" required>
-        <input type="password" id="contrasena" placeholder="Contraseña" required>
-        <button type="submit">Entrar</button>
-    </form>
-    <p id="mensaje"></p>
+
+    <header>
+        <h1>Bienvenido a Salud Total</h1>
+    </header>
+
+    <section id="login-container">
+        <h2>Iniciar sesión</h2>
+        <form id="loginForm">
+            <label for="usuario">Usuario</label>
+            <input type="text" id="usuario" placeholder="Usuario" required>
+
+            <label for="contrasena">Contraseña</label>
+            <input type="password" id="contrasena" placeholder="Contraseña" required>
+
+            <button type="submit">Entrar</button>
+        </form>
+
+        <p id="mensaje"></p>
+    </section>
+
+    <script src="login.js"></script>
 </body>
 </html>
