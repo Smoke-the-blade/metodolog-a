@@ -7,7 +7,7 @@ CREATE TABLE usuarios (
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     password VARCHAR(255) NOT NULL,
-    dni VARCHAR(20) UNIQUE NOT NULL,
+    dni VARCHAR(11) UNIQUE NOT NULL,
     rol SET('paciente', 'medico', 'admin') NOT NULL
 );
 
@@ -40,27 +40,3 @@ CREATE TABLE turnos (
     FOREIGN KEY (especialidad_id) REFERENCES especialidades(id)
 );
 
--- Insertar roles disponibles
-INSERT INTO roles (nombre) VALUES ('paciente'), ('medico'), ('administrador');
-
--- Crear usuario que tiene todos los roles
-INSERT INTO usuarios (nombre, email, contraseña, dni)
-VALUES ('Juan Admin Médico', 'juan@salud.com', '1234', '30123456');
-
--- Asociar roles
-INSERT INTO usuario_rol (usuario_id, rol_id) VALUES
-(1, 1), -- paciente
-(1, 2), -- medico
-(1, 3); -- administrador
-
--- Cargar especialidades
-INSERT INTO especialidades (nombre) VALUES
-('Clínica general'), ('Pediatría'), ('Cardiología'), ('Ginecología');
-
--- Datos médicos
-INSERT INTO medicos (usuario_id, especialidad_id, matricula)
-VALUES (1, 1, 'MAT123');
-
--- Datos paciente
-INSERT INTO pacientes (usuario_id, telefono, direccion, fecha_nacimiento)
-VALUES (1, '3777445566', 'Av. Salud 123', '1980-01-01');
