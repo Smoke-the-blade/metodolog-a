@@ -1,41 +1,56 @@
--- Crear base de datos
+-- Base de datos
 CREATE DATABASE salud_total;
 USE salud_total;
 
--- Tabla de usuarios con roles
+-- Tabla de usuarios
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL,
     email VARCHAR(100) UNIQUE NOT NULL,
     contraseña VARCHAR(255) NOT NULL,
-    rol ENUM('paciente', 'medico', 'administrador') NOT NULL
+    dni VARCHAR(20) UNIQUE NOT NULL
 );
 
--- Tabla de especialidades médicas
+-- Tabla de roles posibles
+CREATE TABLE roles (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre ENUM('paciente', 'medico', 'administrador') NOT NULL UNIQUE
+);
+
+-- Relación muchos a muchos: usuarios pueden tener múltiples roles
+CREATE TABLE usuario_rol (
+    usuario_id INT,
+    rol_id INT,
+    PRIMARY KEY (usuario_id, rol_id),
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    FOREIGN KEY (rol_id) REFERENCES roles(id) ON DELETE CASCADE
+);
+
+-- Tabla de especialidades
 CREATE TABLE especialidades (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100) NOT NULL
 );
 
--- Tabla de médicos (relación 1 a 1 con usuarios)
+-- Tabla de médicos (si el usuario tiene el rol 'medico')
 CREATE TABLE medicos (
-    id INT PRIMARY KEY, -- mismo ID que en usuarios
+    usuario_id INT PRIMARY KEY,
     especialidad_id INT NOT NULL,
-    FOREIGN KEY (id) REFERENCES usuarios(id),
+    matricula VARCHAR(50) UNIQUE NOT NULL,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
     FOREIGN KEY (especialidad_id) REFERENCES especialidades(id)
 );
 
--- Tabla de pacientes (relación 1 a 1 con usuarios)
+-- Tabla de pacientes (si el usuario tiene el rol 'paciente')
 CREATE TABLE pacientes (
-    id INT PRIMARY KEY, -- mismo ID que en usuarios
-    dni VARCHAR(20) UNIQUE,
+    usuario_id INT PRIMARY KEY,
     telefono VARCHAR(20),
     direccion VARCHAR(255),
     fecha_nacimiento DATE,
-    FOREIGN KEY (id) REFERENCES usuarios(id)
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id)
 );
 
--- Tabla de turnos
+-- Turnos
 CREATE TABLE turnos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     paciente_id INT NOT NULL,
@@ -45,12 +60,12 @@ CREATE TABLE turnos (
     hora TIME NOT NULL,
     estado ENUM('en_espera', 'confirmado', 'cancelado', 'reprogramado') DEFAULT 'en_espera',
     observaciones TEXT,
-    FOREIGN KEY (paciente_id) REFERENCES pacientes(id),
+    FOREIGN KEY (paciente_id) REFERENCES pacientes(usuario_id),
     FOREIGN KEY (especialidad_id) REFERENCES especialidades(id),
-    FOREIGN KEY (medico_id) REFERENCES medicos(id)
+    FOREIGN KEY (medico_id) REFERENCES medicos(usuario_id)
 );
 
--- Tabla de contactos (desde la web)
+-- Contactos desde la web
 CREATE TABLE contactos (
     id INT AUTO_INCREMENT PRIMARY KEY,
     nombre VARCHAR(100),
