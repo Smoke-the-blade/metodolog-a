@@ -1,42 +1,39 @@
--- Crear base de datos
 CREATE DATABASE salud_total;
 USE salud_total;
 
--- Tabla única de usuarios con múltiples roles
+-- Tabla usuarios con rol único
 CREATE TABLE usuarios (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    contraseña VARCHAR(255) NOT NULL,
-    dni VARCHAR(20) UNIQUE NOT NULL,
-    roles SET('paciente', 'medico', 'administrador') NOT NULL,
-    
-    -- Datos solo si es paciente
-    telefono VARCHAR(20),
-    direccion VARCHAR(255),
-    fecha_nacimiento DATE,
-    
-    -- Datos solo si es médico
-    matricula VARCHAR(50) UNIQUE,
-    especialidad_id INT
+    nombre VARCHAR(100),
+    email VARCHAR(100) UNIQUE,
+    password VARCHAR(255),
+    rol ENUM('paciente', 'medico', 'admin') NOT NULL
 );
 
--- Especialidades médicas
+-- Tabla de especialidades
 CREATE TABLE especialidades (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    nombre VARCHAR(100) NOT NULL
+    nombre VARCHAR(100) UNIQUE
 );
 
--- Turnos: paciente y médico referencian usuarios
+-- Relación muchos a muchos entre médicos y especialidades
+CREATE TABLE medico_especialidad (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    medico_id INT,
+    especialidad_id INT,
+    FOREIGN KEY (medico_id) REFERENCES usuarios(id),
+    FOREIGN KEY (especialidad_id) REFERENCES especialidades(id)
+);
+
+-- Turnos con vínculos a médico, paciente y especialidad
 CREATE TABLE turnos (
     id INT AUTO_INCREMENT PRIMARY KEY,
-    paciente_id INT NOT NULL,
-    medico_id INT NOT NULL,
-    especialidad_id INT NOT NULL,
-    fecha DATE NOT NULL,
-    hora TIME NOT NULL,
+    paciente_id INT,
+    medico_id INT,
+    especialidad_id INT,
+    fecha DATE,
+    hora TIME,
     estado ENUM('en_espera', 'confirmado', 'cancelado', 'reprogramado') DEFAULT 'en_espera',
-    observaciones TEXT,
     FOREIGN KEY (paciente_id) REFERENCES usuarios(id),
     FOREIGN KEY (medico_id) REFERENCES usuarios(id),
     FOREIGN KEY (especialidad_id) REFERENCES especialidades(id)
