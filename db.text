@@ -1,5 +1,5 @@
-CREATE DATABASE salud_total;
-USE salud_total;
+CREATE DATABASE saludtotal;
+USE saludtotal;
 
 -- Tabla de usuarios
 CREATE TABLE usuarios (
