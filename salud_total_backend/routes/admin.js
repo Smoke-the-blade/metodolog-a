@@ -22,5 +22,18 @@ router.get('/usuarios', async (req, res) => {
     `);
     res.json(rows);
   });
+
+  router.put('/turno/:id/estado', async (req, res) => {
+    const turnoId = req.params.id;
+    const { estado } = req.body;
+  
+    try {
+      await db.query('UPDATE turnos SET estado = ? WHERE id = ?', [estado, turnoId]);
+      res.json({ mensaje: 'Estado actualizado por admin' });
+    } catch (error) {
+      res.status(500).json({ mensaje: 'Error al actualizar estado', error });
+    }
+  });
+  
   
   module.exports = router;

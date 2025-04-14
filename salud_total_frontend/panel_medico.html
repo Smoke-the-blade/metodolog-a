@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Médico</title>
+</head>
+<body>
+  <h2>Bienvenido/a Dr./Dra. <span id="nombreUsuario"></span></h2>
+  <button onclick="logout()">Cerrar sesión</button>
+
+  <h3>Mis turnos asignados</h3>
+  <ul id="listaTurnos"></ul>
+
+  <script>
+    const usuario_id = localStorage.getItem('usuario_id');
+    const usuario_nombre = localStorage.getItem('usuario_nombre');
+    document.getElementById('nombreUsuario').innerText = usuario_nombre;
+
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    async function obtenerTurnos() {
+      const res = await fetch(`http://localhost:3000/api/medico/${usuario_id}/turnos`);
+      const turnos = await res.json();
+      const lista = document.getElementById('listaTurnos');
+      lista.innerHTML = '';
+      turnos.forEach(t => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <b>${t.fecha} ${t.hora}</b> - ${t.especialidad} con <b>${t.paciente_nombre}</b>
+          [<span>${t.estado}</span>]
+          ${t.estado === 'en_espera' ? `
+            <button onclick="actualizarEstado(${t.id}, 'confirmado')">Confirmar</button>
+            <button onclick="actualizarEstado(${t.id}, 'cancelado')">Cancelar</button>
+          ` : ''}
+        `;
+        lista.appendChild(li);
+      });
+    }
+
+    async function actualizarEstado(turnoId, estado) {
+      const res = await fetch(`http://localhost:3000/api/medico/turno/${turnoId}/estado`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado })
+      });
+
+      const data = await res.json();
+      alert(data.mensaje);
+      obtenerTurnos(); // Recargar
+    }
+
+    obtenerTurnos();
+  </script>
+</body>
+</html>

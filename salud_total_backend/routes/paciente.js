@@ -28,4 +28,31 @@ router.get('/:id/turnos', async (req, res) => {
     res.json({ mensaje: 'Turno solicitado correctamente' });
   });
   
+  router.get('/medicos/especialidad/:id', async (req, res) => {
+    const especialidadId = req.params.id;
+    const [rows] = await db.query(`
+      SELECT u.id, u.nombre
+      FROM usuarios u
+      JOIN medico_especialidad me ON u.id = me.medico_id
+      WHERE me.especialidad_id = ? AND FIND_IN_SET('medico', u.rol)
+    `, [especialidadId]);
+  
+    res.json(rows);
+  });
+  router.post('/turno', async (req, res) => {
+    const { paciente_id, medico_id, especialidad_id, fecha, hora } = req.body;
+  
+    try {
+      await db.query(`
+        INSERT INTO turnos (paciente_id, medico_id, especialidad_id, fecha, hora)
+        VALUES (?, ?, ?, ?, ?)
+      `, [paciente_id, medico_id, especialidad_id, fecha, hora]);
+  
+      res.json({ mensaje: 'Turno solicitado correctamente' });
+    } catch (error) {
+      res.status(500).json({ mensaje: 'Error al solicitar turno', error });
+    }
+  });
+  
+
   module.exports = router;
