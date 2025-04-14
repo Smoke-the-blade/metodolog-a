@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Panel Administrador</title>
+</head>
+<body>
+  <h2>Panel del Administrador</h2>
+  <button onclick="logout()">Cerrar sesión</button>
+
+  <h3>Usuarios del sistema</h3>
+  <ul id="listaUsuarios"></ul>
+
+  <h3>Turnos registrados</h3>
+  <ul id="listaTurnos"></ul>
+
+  <script>
+    function logout() {
+      localStorage.clear();
+      window.location.href = "login.html";
+    }
+
+    async function cargarUsuarios() {
+      const res = await fetch('http://localhost:3000/api/admin/usuarios');
+      const usuarios = await res.json();
+      const lista = document.getElementById('listaUsuarios');
+      lista.innerHTML = '';
+      usuarios.forEach(u => {
+        const li = document.createElement('li');
+        li.textContent = `${u.nombre} (${u.rol}) - ${u.email}`;
+        lista.appendChild(li);
+      });
+    }
+
+    async function cargarTurnos() {
+      const res = await fetch('http://localhost:3000/api/admin/turnos');
+      const turnos = await res.json();
+      const lista = document.getElementById('listaTurnos');
+      lista.innerHTML = '';
+      turnos.forEach(t => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <b>${t.fecha} ${t.hora}</b> - ${t.especialidad} con <b>${t.medico_nombre}</b>
+          → <b>${t.paciente_nombre}</b> [${t.estado}]
+          <select onchange="actualizarEstado(${t.id}, this.value)">
+            <option value="">Modificar estado</option>
+            <option value="confirmado">Confirmar</option>
+            <option value="cancelado">Cancelar</option>
+            <option value="reprogramado">Reprogramar</option>
+          </select>
+        `;
+        lista.appendChild(li);
+      });
+    }
+
+    async function actualizarEstado(turnoId, estado) {
+      if (!estado) return;
+      const res = await fetch(`http://localhost:3000/api/admin/turno/${turnoId}/estado`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ estado })
+      });
+      const data = await res.json();
+      alert(data.mensaje);
+      cargarTurnos();
+    }
+
+    cargarUsuarios();
+    cargarTurnos();
+  </script>
+</body>
+</html>

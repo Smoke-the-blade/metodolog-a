@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Login - SALUD TOTAL</title>
+</head>
+<body>
+  <h2>Iniciar sesión</h2>
+  <form id="formLogin">
+    <input type="email" id="email" placeholder="Correo electrónico" required><br>
+    <input type="password" id="password" placeholder="Contraseña" required><br>
+    <button type="submit">Ingresar</button>
+  </form>
+
+  <script>
+    const form = document.getElementById('formLogin');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      const res = await fetch('http://localhost:3000/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await res.json();
+
+      if (res.ok) {
+        localStorage.setItem('usuario_id', data.id);
+        localStorage.setItem('usuario_nombre', data.nombre);
+        localStorage.setItem('usuario_rol', data.rol);
+        localStorage.setItem('usuario_dni', data.dni);
+
+        // Redirigir al panel correspondiente
+        const rol = data.rol;
+        if (rol.includes('admin')) {
+          window.location.href = 'panel_admin.html';
+        } else if (rol.includes('medico')) {
+          window.location.href = 'panel_medico.html';
+        } else {
+          window.location.href = 'panel_paciente.html';
+        }
+      } else {
+        alert(data.mensaje);
+      }
+    });
+  </script>
+</body>
+</html>
